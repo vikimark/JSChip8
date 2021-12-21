@@ -13,7 +13,8 @@ export class Chip8 {
         for(let i = 0; i < buffer.length; i++){
             this.memory[0x200 + i] = buffer[i];
             
-            console.log(this.memory[0x200 + i].toString(16));
+            // check wheter memory load end at 0x9F (0x50 - 0x9F)
+            // console.log(this.memory[0x200 + i].toString(16));
         }
         console.log("loading rom successfully");
     }
