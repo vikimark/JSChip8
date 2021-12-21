@@ -12,6 +12,8 @@ export class Chip8 {
         console.log("loading rom into memory...");
         for(let i = 0; i < buffer.length; i++){
             this.memory[0x200 + i] = buffer[i];
+            
+            console.log(this.memory[0x200 + i].toString(16));
         }
         console.log("loading rom successfully");
     }

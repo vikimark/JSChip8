@@ -1,14 +1,8 @@
 import {Chip8} from "./chip8.js";
+import * as fs from 'fs';
 
 let chip8 = new Chip8();
 
-// can't pass through require('fs')
-const fs = require('fs')
-fs.readFile('roms/Stars.ch8', 'utf8', (err, data) => {
-    if(err){
-        console.error(err);
-        return;
-    }
-    buffer = data;
+fs.readFile('roms/Stars.ch8', null, (err, data) => {
+    chip8.loadROM(data);
 })
-chip8.loadROM(buffer);
