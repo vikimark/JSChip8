@@ -49,7 +49,6 @@ export class Chip8 {
         let opcode;
         opcode = (this.memory[this.PC] << 8 | this.memory[this.PC + 1]) & 0xFFFF;
         this.PC += 2;
-        console.log(opcode.toString(16));
         return opcode;
     }
     _execute(opcode){

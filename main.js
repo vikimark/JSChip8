@@ -17,8 +17,6 @@ function cycle(){
     // display
     // I/O
 }
-for(let i = 0; i < 100; i++){
-    cycle();
-}
+cycle();
 
 

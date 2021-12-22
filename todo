@@ -1,1 +1,5 @@
--> can not pass through require('fs')
+-> can not pass through require('fs') : solved (using import instead)
+-> read roms code : solved
+-> cpu : solved
+-> opcode: unimplemmeted
+-> game cycle: unimplemented 
