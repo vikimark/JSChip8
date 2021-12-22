@@ -21,6 +21,9 @@ class Chip8 {
     constructor(){
         this.memory = new Array(MEMORY_SIZE).fill(0);
         this.registers = new Array(16).fill(0);
+        this.I = 0;
+        this.timer = 0;
+        this.sound = 0;
         this.PC = 0x200;
         this.SP = -1;
         this.stack = new Array(16).fill(0);
@@ -102,30 +105,32 @@ class Chip8 {
                     case 0:
                         this.LD_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
+                    case 0x1:
+                        this.OR_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
+                    case 0x2:
+                        this.AND_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
+                    case 0x3:
+                        this.XOR_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
+                    case 0x4:
+                        this.ADD_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
+                    case 0x5:
+                        this.SUB_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
+                    case 0x6:
+                        this.SHR_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
+                    case 0x7:
+                        this.SUBN_Vx_Vy(opcode);
                         break;
-                    case 0:
-                        this.LD_Vx_Vy(opcode);
-                        break;                                
+                    case 0xE:
+                        this.SHL_Vx_Vy(opcode);
+                        break;
+                    default:
+                        throw "opcode not found at 0x8"                                    
                 }
                 break;
             case 0x9:
@@ -144,11 +149,201 @@ class Chip8 {
                 this.DRW_Vx_Vy_nibble(opcode);
                 break;
             case 0xE:
+                switch(opcode & 0xFF){
+                    case 0x9E:
+                        this.SKP_Vx(opcode);
+                        break;
+                    case 0xA1:
+                        this.SKNP_Vx(opcode);
+                        break;
+                    default:
+                        throw "opcode not found at 0xE"        
+                }
                 break; 
             case 0xF:
+                switch(opcode & 0xFF){
+                    case 0x07:
+                        this.LD_Vx_DT(opcode);
+                        break;
+                    case 0x0A:
+                        this.LD_Vx_K(opcode);
+                        break;
+                    case 0x15:
+                        this.LD_DT_Vx(opcode);
+                        break;
+                    case 0x18:
+                        this.LD_ST_Vx(opcode);
+                        break;
+                    case 0x1E:
+                        this.ADD_I_Vx(opcode);
+                        break;
+                    case 0x29:
+                        this.LD_F_Vx(opcode);
+                        break;
+                    case 0x33:
+                        this.LD_B_Vx(opcode);
+                        break;
+                    case 0x55:
+                        this.LD_I_Vx(opcode);
+                        break;
+                    case 0x65:
+                        this.LD_Vx_I(opcode);
+                        break;
+                    default:
+                        throw "opcode not found at 0xF"                                    
+                }
                 break;
         }                                                                                                                                
             
+    }
+
+    CLS(){
+        this.screenBuffer.fill(0);
+        // this is CLS for mockup UI;
+
+        // has to implement CLS for terminal
+    }
+    RET(){
+        this.PC  = this.stack[SP];
+        this.SP -= 1;
+        // throw 'RET not implement';
+    }
+    SYS_addr(opcode){
+        throw 'SYS_addr not implement';
+    }
+    JP_addr(opcode){
+        this.PC = opcode & 0xFFF;
+        // throw 'JP_addr not implement';
+    }
+    CALL_addr(opcode){
+        this.SP += 1;
+        this.stack[SP] = this.PC;
+        this.PC = (opcode & 0xFFF);
+        // throw 'CALL_addr not implement';
+    }
+    SE_Vx_byte(opcode){
+        numRegister = ((opcode >> 8) & 0xF);
+        if(this.registers[numRegister] == (opcode & 0xFF)){
+            this.PC += 2;
+        }
+        // throw 'SE_Vx_byte not implement';
+    }
+    SNE_Vx_byte(opcode){
+        numRegister = ((opcode >> 8) & 0xF);
+        if(this.registers[numRegister] != (opcode & 0xFF)){
+            this.PC += 2;
+        }
+        // throw 'SNE_Vx_byte not implement';
+    }
+    SE_Vx_Vy(opcode){
+        numRegisterX = ((opcode >> 8) & 0xF);
+        numRegisterY = ((opcode >> 4) & 0xF);
+        if(this.registers[numRegisterX] == this.registers[numRegisterY]){
+            this.PC += 2;
+        }
+        // throw 'SE_Vx_Vy not implement';
+    }
+    LD_Vx_byte(opcode){
+        numRegister = ((opcode >> 8) & 0xF);
+        this.registers[numRegister] = (opcode & 0xFF); 
+        // throw 'LD_Vx_byte not implement';
+    }
+    ADD_Vx_byte(opcode){
+        numRegister = ((opcode >> 8) & 0xF);
+        this.registers[numRegister] = this.registers + ((opcode >> 8) & 0xFF)
+        // throw 'ADD_Vx_byte not implement';
+    }
+    LD_Vx_Vy(opcode){
+        numRegisterX = ((opcode >> 8) & 0xF);
+        numRegisterY = ((opcode >> 4) & 0xF);
+        this.registers[numRegisterX] = this.registers[numRegisterY];
+        // throw 'LD_Vx_Vy not implement';
+    }
+    OR_Vx_Vy(opcode){
+        
+        throw 'OR_Vx_Vy not implement';
+    }
+    AND_Vx_Vy(opcode){
+        
+        throw 'AND_Vx_Vy not implement';
+    }
+    XOR_Vx_Vy(opcode){
+        throw 'XOR_Vx_Vy not implement';
+    }
+    ADD_Vx_Vy(opcode){
+        throw 'ADD_Vx_Vy not implement';
+    }
+    SUB_Vx_Vy(opcode){
+        throw 'SUB_Vx_Vy not implement';
+    }
+    SHR_Vx_Vy(opcode){
+        throw 'SHR_Vx_Vy not implement';
+    }
+    SUBN_Vx_Vy(opcode){
+        throw 'SUBN_Vx_Vy not implement';
+    }
+    SHL_Vx_Vy(opcode){
+        throw 'SHL_Vx_Vy not implement';
+    }
+    SNE_Vx_Vy(opcode){
+        numRegisterX = ((opcode >> 8) & 0xF);
+        numRegisterY = ((opcode >> 4) & 0xF);
+        if(this.registers[numRegisterX] != this.registers[numRegisterY]){
+            this.PC += 2;
+        }
+        // throw 'SNE_Vx_Vy not implement';
+    }
+    LD_I_addr(opcode){
+        this.I = (opcode & 0xFFF);
+        // throw 'LD_I_addr not implement';
+    }
+    JP_V0_addr(opcode){
+        const location = (opcode & 0xFFF) + this.registers[0];
+        this.PC = location;
+        // throw 'JP_V0_addr not implement';
+    }
+    RND_Vx_byte(opcode){
+        numRegister = ((opcode >> 8) & 0xF);
+        let ranN = Math.floor(Math.random() * 256);
+        this.registers[numRegister] = ranN & (opcode & 0xFF);
+        // throw 'RND_Vx_byte not implement';
+    }
+    DRW_Vx_Vy_nibble(opcode){
+        
+        // throw 'DRW_Vx_Vy_nibble not implement';
+    }
+    SKP_Vx(opcode){
+        throw 'SKP_Vx not implement';
+    }
+    SKNP_Vx(opcode){
+        throw 'SKNP not implement';
+    }
+    LD_Vx_DT(opcode){
+        throw 'LD_Vx_DT not implement';
+    }
+    LD_Vx_K(opcode){
+        throw 'LD_Vx_k not implement';
+    }
+    LD_DT_Vx(opcode){
+        throw 'LD_DT_Vx not implement';
+    }
+    LD_ST_Vx(opcode){
+        throw 'LD_ST_Vx not implement';
+    }
+    ADD_I_Vx(opcode){
+        throw 'ADD_I_Vx not implement';
+    }
+    LD_F_Vx(opcode){
+        throw 'LD_F_Vx not implement';
+    }
+    LD_B_Vx(opcode){
+        throw 'LD_B_Vx not implement';
+    }
+    LD_I_Vx(opcode){
+        throw 'LD_I_Vx not implement';
+    }
+    LD_Vx_I(opcode){
+        throw 'LD_Vx_I not implement';
     }
 
 }
