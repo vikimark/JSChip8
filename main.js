@@ -1,7 +1,7 @@
 const FILE_PATH = 'roms/Stars.ch8'
 
-import {Chip8} from "./chip8.js";
-import * as fs from 'fs';
+const {Chip8} = require("./chip8.js");
+const fs = require('fs');
 
 let chip8 = new Chip8();
 

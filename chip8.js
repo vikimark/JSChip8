@@ -1,4 +1,5 @@
 const MEMORY_SIZE = 4096;
+const SCREEN_SIZE = 64 * 32;
 const FONTS = [0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
     0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -16,7 +17,7 @@ const FONTS = [0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
     0xF0, 0x80, 0xF0, 0x80, 0x80];  // F
 
-export class Chip8 {
+class Chip8 {
     constructor(){
         this.memory = new Array(MEMORY_SIZE).fill(0);
         this.registers = new Array(16).fill(0);
@@ -25,6 +26,8 @@ export class Chip8 {
         this.stack = new Array(16).fill(0);
         
         this.loadFonts();
+
+        this.screenBuffer = new Array(SCREEN_SIZE).fill(0);
     }
     loadROM(buffer){
         console.log("loading rom into memory...");
@@ -57,4 +60,8 @@ export class Chip8 {
         //don't forget to increment PC if argument is required
     }
 
+}
+
+module.exports = {
+    Chip8,
 }
