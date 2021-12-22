@@ -41,4 +41,21 @@ export class Chip8 {
         }
         console.log("loading FONTS successfully");
     }
+    _fetch(PC){
+        //argument : PC -> program counter pointing at present address
+        //return   : opcode combining two 2 bytes in endian way(?)
+        //increment PC by 2 at the end of function
+
+        let opcode;
+        opcode = (this.memory[this.PC] << 8 | this.memory[this.PC + 1]) & 0xFFFF;
+        this.PC += 2;
+        console.log(opcode.toString(16));
+        return opcode;
+    }
+    _execute(opcode){
+        //argument : opcode -> number containing 4 bytes
+        //firstly, decode an opcode then run the specific task
+        //don't forget to increment PC if argument is required
+    }
+
 }
