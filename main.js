@@ -19,4 +19,6 @@ function cycle(){
 }
 cycle();
 
+console.log(__dirname);
+
 
