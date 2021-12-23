@@ -1,5 +1,7 @@
 const MEMORY_SIZE = 4096;
 const SCREEN_SIZE = 64 * 32;
+const SCREEN_WIDTH = 64;
+const SCREEN_HEIGHT = 32;
 const FONTS = [0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
     0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -222,40 +224,40 @@ class Chip8 {
         // throw 'CALL_addr not implement';
     }
     SE_Vx_byte(opcode){
-        numRegister = ((opcode >> 8) & 0xF);
+        const numRegister = ((opcode >> 8) & 0xF);
         if(this.registers[numRegister] == (opcode & 0xFF)){
             this.PC += 2;
         }
         // throw 'SE_Vx_byte not implement';
     }
     SNE_Vx_byte(opcode){
-        numRegister = ((opcode >> 8) & 0xF);
+        const numRegister = ((opcode >> 8) & 0xF);
         if(this.registers[numRegister] != (opcode & 0xFF)){
             this.PC += 2;
         }
         // throw 'SNE_Vx_byte not implement';
     }
     SE_Vx_Vy(opcode){
-        numRegisterX = ((opcode >> 8) & 0xF);
-        numRegisterY = ((opcode >> 4) & 0xF);
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
         if(this.registers[numRegisterX] == this.registers[numRegisterY]){
             this.PC += 2;
         }
         // throw 'SE_Vx_Vy not implement';
     }
     LD_Vx_byte(opcode){
-        numRegister = ((opcode >> 8) & 0xF);
+        const numRegister = ((opcode >> 8) & 0xF);
         this.registers[numRegister] = (opcode & 0xFF); 
         // throw 'LD_Vx_byte not implement';
     }
     ADD_Vx_byte(opcode){
-        numRegister = ((opcode >> 8) & 0xF);
+        const numRegister = ((opcode >> 8) & 0xF);
         this.registers[numRegister] = this.registers + ((opcode >> 8) & 0xFF)
         // throw 'ADD_Vx_byte not implement';
     }
     LD_Vx_Vy(opcode){
-        numRegisterX = ((opcode >> 8) & 0xF);
-        numRegisterY = ((opcode >> 4) & 0xF);
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
         this.registers[numRegisterX] = this.registers[numRegisterY];
         // throw 'LD_Vx_Vy not implement';
     }
@@ -286,8 +288,8 @@ class Chip8 {
         throw 'SHL_Vx_Vy not implement';
     }
     SNE_Vx_Vy(opcode){
-        numRegisterX = ((opcode >> 8) & 0xF);
-        numRegisterY = ((opcode >> 4) & 0xF);
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
         if(this.registers[numRegisterX] != this.registers[numRegisterY]){
             this.PC += 2;
         }
@@ -303,13 +305,30 @@ class Chip8 {
         // throw 'JP_V0_addr not implement';
     }
     RND_Vx_byte(opcode){
-        numRegister = ((opcode >> 8) & 0xF);
+        const numRegister = ((opcode >> 8) & 0xF);
         let ranN = Math.floor(Math.random() * 256);
         this.registers[numRegister] = ranN & (opcode & 0xFF);
         // throw 'RND_Vx_byte not implement';
     }
     DRW_Vx_Vy_nibble(opcode){
-        
+        const n_byte = (opcode & 0xF);
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        const Vx = this.registers[numRegisterX];
+        const Vy = this.registers[numRegisterY];
+        for(let i = 0; i < n_byte; i++){
+            const byte_to_draw = this.memory[this.I];
+            const coorY = (Vy + i) % SCREEN_HEIGHT;
+            for(let row = 0; row < 8; row++){
+                const bit = ((byte_to_draw >> row) & 1)
+                const coorX = (Vx + row) % SCREEN_WIDTH;
+                if(bit == 1 && this.screenBuffer[coorY * SCREEN_WIDTH + coorX] == 1){                    
+                    this.registers[0xF] = 1;
+                }
+                this.screenBuffer[coorY * SCREEN_WIDTH + coorX] = (this.screenBuffer[coorY * SCREEN_WIDTH + coorX] ^ bit) & 1; 
+
+            }
+        }
         // throw 'DRW_Vx_Vy_nibble not implement';
     }
     SKP_Vx(opcode){
