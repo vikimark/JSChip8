@@ -13,8 +13,8 @@ class Interface{
             let text = ''
             for(let j = 0; j < WIDTH; j++){
                 if(screenBuffer[i * WIDTH +j] == 0)
-                    text += '`';
-                else text += 'E';    
+                    text += ' ';
+                else text += '■';    
             }
             console.log(text);
         }

@@ -1,5 +1,7 @@
--> can not pass through require('fs') : solved (using import instead)
+-> can not pass through require('fs') : solved
 -> read roms code : solved
 -> cpu : solved
--> opcode: unimplemmeted
--> game cycle: unimplemented 
+-> opcode: solved
+-> game cycle: solved 
+-> delaytimer issue : UN
+-> keypress issue : most of real time game are unplayable (can play slow game)
