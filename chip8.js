@@ -268,30 +268,73 @@ class Chip8 {
         // throw 'LD_Vx_Vy not implement';
     }
     OR_Vx_Vy(opcode){
-        
-        throw 'OR_Vx_Vy not implement';
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        this.registers[numRegisterX] = this.registers[numRegisterX] | this.registers[numRegisterY];
+        // throw 'OR_Vx_Vy not implement';
     }
     AND_Vx_Vy(opcode){
-        
-        throw 'AND_Vx_Vy not implement';
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        this.registers[numRegisterX] = this.registers[numRegisterX] & this.registers[numRegisterY];
+        // throw 'AND_Vx_Vy not implement';
     }
     XOR_Vx_Vy(opcode){
-        throw 'XOR_Vx_Vy not implement';
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        this.registers[numRegisterX] = this.registers[numRegisterX] ^ this.registers[numRegisterY];
+        // throw 'XOR_Vx_Vy not implement';
     }
     ADD_Vx_Vy(opcode){
-        throw 'ADD_Vx_Vy not implement';
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        const value = this.registers[numRegisterX] + this.registers[numRegisterY];
+        if((value >> 8) & 1){
+            this.registers[0xF] = 1;
+        }else this.registers[0xF] = 0;
+        this.registers[numRegisterX] = value & 0xFFFF;
+        // throw 'ADD_Vx_Vy not implement';
     }
     SUB_Vx_Vy(opcode){
-        throw 'SUB_Vx_Vy not implement';
+        // what if the value is negative?
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        let value = new Uint8Array(1);
+        value[0] = this.registers[numRegisterX] - this.registers[numRegisterY];
+        if(this.registers[numRegisterX] > this.registers[numRegisterY]){
+            this.registers[0xF] = 1;
+        }else this.registers[0xF] = 0;
+        this.registers[numRegisterX] = value[0];
+        // throw 'SUB_Vx_Vy not implement';
     }
     SHR_Vx_Vy(opcode){
-        throw 'SHR_Vx_Vy not implement';
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        if((this.registers[numRegisterX] & 1)){
+            this.registers[0xF] = 1;
+        }else this.registers[0xF] = 0;
+        this.registers[numregisterX] >>= 1;
+        // throw 'SHR_Vx_Vy not implement';
     }
     SUBN_Vx_Vy(opcode){
-        throw 'SUBN_Vx_Vy not implement';
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        let value = new Uint8Array(1);
+        value[0] = this.registers[numRegisterY] - this.registers[numregisterX];
+        if(this.registers[numRegisterY] > this.registers[numregisterX]){
+            this.registers[0xF] = 1;
+        }else this.registers[0xF] = 0;
+        this.registers[numRegisterX] = value[0];
+        // throw 'SUBN_Vx_Vy not implement';
     }
     SHL_Vx_Vy(opcode){
-        throw 'SHL_Vx_Vy not implement';
+        const numRegisterX = ((opcode >> 8) & 0xF);
+        const numRegisterY = ((opcode >> 4) & 0xF);
+        if(((this.registers[numRegisterX] >> 7)& 1)){
+            this.registers[0xF] = 1;
+        }else this.registers[0xF] = 0;
+        this.registers[numregisterX] <<= 1;
+        // throw 'SHL_Vx_Vy not implement';
     }
     SNE_Vx_Vy(opcode){
         const numRegisterX = ((opcode >> 8) & 0xF);
@@ -357,7 +400,9 @@ class Chip8 {
         throw 'LD_ST_Vx not implement';
     }
     ADD_I_Vx(opcode){
-        throw 'ADD_I_Vx not implement';
+        const numRegister = ((opcode >> 8) & 0xF);
+        this.I += this.registers[numregister];
+        // throw 'ADD_I_Vx not implement';
     }
     LD_F_Vx(opcode){
         throw 'LD_F_Vx not implement';
@@ -366,10 +411,18 @@ class Chip8 {
         throw 'LD_B_Vx not implement';
     }
     LD_I_Vx(opcode){
-        throw 'LD_I_Vx not implement';
+        numregister = opcode & 0xF;
+        for(let i = 0; i < numregister + 1; i++){
+            this.memory[this.I + i] = this.registers[i]
+        }
+        // throw 'LD_I_Vx not implement';
     }
     LD_Vx_I(opcode){
-        throw 'LD_Vx_I not implement';
+        numregister = opcode & 0xF;
+        for(let i = 0; i < numregister + 1; i++){
+            this.memory[this.I + i] = this.registers[i]
+        }
+        // throw 'LD_Vx_I not implement';
     }
     _debuggerDisplay(){
         let text =  "PC : " + this.PC.toString(16).toUpperCase() + "," +
