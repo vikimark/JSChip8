@@ -1,3 +1,5 @@
+const { stripTags } = require("blessed");
+
 const MEMORY_SIZE = 4096;
 const SCREEN_SIZE = 64 * 32;
 const SCREEN_WIDTH = 64;
@@ -58,6 +60,7 @@ class Chip8 {
         let opcode;
         opcode = (this.memory[this.PC] << 8 | this.memory[this.PC + 1]) & 0xFFFF;
         this.PC += 2;
+        console.log(opcode.toString(16).toUpperCase());
         return opcode;
     }
     _execute(opcode){
@@ -65,22 +68,23 @@ class Chip8 {
         //firstly, decode an opcode then run the specific task
         //don't forget to increment PC if argument is required
 
-        const firstBit = (opcode >> 12) & 0xF; 
+        const firstBit = (opcode >> 12) & 0xF;
         switch(firstBit){
             case 0x0:
-                if(opcode & 0xFF == 0xE0 | opcode & 0xFF == 0xEE){
-                    switch(opcode & 0xFF){
-                        case 0xE0:
-                            this.CLS();
-                            break;
-                        case 0xEE:
-                            this.RET();
-                            break;
-                        default :
-                            throw "opcode not found at 0x0";      
-                    }
-                }else this.SYS_addr(opcode);
-                break;
+                switch(opcode & 0xFF){
+                    case 0xE0:
+                        console.log('CLS');
+                        this.CLS();
+                        break;
+                    case 0xEE:
+                        this.RET();
+                        break;
+                    default :
+                        this.SYS_addr(opcode);
+                        // throw "opcode not found at 0x0";
+                        break;
+                }
+                break;              
             case 0x1:
                 this.JP_addr(opcode);
                 break;
@@ -195,8 +199,10 @@ class Chip8 {
                         throw "opcode not found at 0xF"                                    
                 }
                 break;
+            default:
+                throw "failed to find opcode";    
         }                                                                                                                                
-            
+        this._debuggerDisplay();
     }
 
     CLS(){
@@ -252,7 +258,7 @@ class Chip8 {
     }
     ADD_Vx_byte(opcode){
         const numRegister = ((opcode >> 8) & 0xF);
-        this.registers[numRegister] = this.registers + ((opcode >> 8) & 0xFF)
+        this.registers[numRegister] = this.registers[numRegister] + (opcode & 0xFF);
         // throw 'ADD_Vx_byte not implement';
     }
     LD_Vx_Vy(opcode){
@@ -311,16 +317,17 @@ class Chip8 {
         // throw 'RND_Vx_byte not implement';
     }
     DRW_Vx_Vy_nibble(opcode){
+        this.registers[0xF] = 0;
         const n_byte = (opcode & 0xF);
         const numRegisterX = ((opcode >> 8) & 0xF);
         const numRegisterY = ((opcode >> 4) & 0xF);
         const Vx = this.registers[numRegisterX];
         const Vy = this.registers[numRegisterY];
         for(let i = 0; i < n_byte; i++){
-            const byte_to_draw = this.memory[this.I];
+            const byte_to_draw = this.memory[this.I + i];
             const coorY = (Vy + i) % SCREEN_HEIGHT;
             for(let row = 0; row < 8; row++){
-                const bit = ((byte_to_draw >> row) & 1)
+                const bit = ((byte_to_draw >> (7 - row)) & 1)
                 const coorX = (Vx + row) % SCREEN_WIDTH;
                 if(bit == 1 && this.screenBuffer[coorY * SCREEN_WIDTH + coorX] == 1){                    
                     this.registers[0xF] = 1;
@@ -364,9 +371,19 @@ class Chip8 {
     LD_Vx_I(opcode){
         throw 'LD_Vx_I not implement';
     }
+    _debuggerDisplay(){
+        let text =  "PC : " + this.PC.toString(16).toUpperCase() + "," +
+                " SP : " + this.SP.toString(16).toUpperCase() + "," +
+                " I : " + this.I.toString(16).toUpperCase() + ",";
+        for(let i = 0; i < 16; i++){
+            text += " V" + i + " : " + this.registers[i].toString(16).toUpperCase() + ",";
+        }
+        console.log(text);        
+    }
 
 }
 
 module.exports = {
     Chip8,
 }
+// hello world, may god blees you
