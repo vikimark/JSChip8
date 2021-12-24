@@ -21,7 +21,7 @@ const FONTS = [0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0xF0, 0x80, 0xF0, 0x80, 0x80];  // F
 
 class Chip8 {
-    constructor(){
+    constructor(webInterface){
         this.memory = new Uint8Array(MEMORY_SIZE).fill(0);
         this.registers = new Uint8Array(16).fill(0);
         this.I = 0;
@@ -35,6 +35,7 @@ class Chip8 {
 
         this.screenBuffer = new Array(SCREEN_SIZE).fill(0);
         this.keyValue = 0; // 16 bit size each bit represent pressed or not press by its key
+        this.webInterface = webInterface;
     }
     loadROM(buffer){
         console.log("loading rom into memory...");
@@ -50,6 +51,9 @@ class Chip8 {
             this.memory[0x50 + i] = FONTS[i];
         }
         console.log("loading FONTS successfully");
+    }
+    resetKeys(){
+        this.keyValue = 0;
     }
     _fetch(PC){
         //argument : PC -> program counter pointing at present address
@@ -220,6 +224,7 @@ class Chip8 {
         this.screenBuffer.fill(0);
         // this is CLS for mockup UI;
 
+        this.webInterface.clearDisplay();
         // has to implement CLS for terminal
     }
     RET(){
@@ -386,7 +391,8 @@ class Chip8 {
                 if(bit == 1 && this.screenBuffer[coorY * SCREEN_WIDTH + coorX] == 1){                    
                     this.registers[0xF] = 1;
                 }
-                this.screenBuffer[coorY * SCREEN_WIDTH + coorX] = (this.screenBuffer[coorY * SCREEN_WIDTH + coorX] ^ bit) & 1; 
+                this.screenBuffer[coorY * SCREEN_WIDTH + coorX] = (this.screenBuffer[coorY * SCREEN_WIDTH + coorX] ^ bit) & 1;
+                this.webInterface.draw(coorX, coorY, this.screenBuffer[coorY * SCREEN_WIDTH + coorX]);
 
             }
         }
@@ -487,378 +493,122 @@ module.exports = {
 }
 // hello world, may god blees you
 },{}],2:[function(require,module,exports){
-(function (process,setImmediate){(function (){
-const FILE_PATH = 'roms/1dcell.ch8'
+const SCREEN_WIDTH = 64;
+const SCREEN_HEIGHT = 32;
+
+class WebInterface{
+    constructor(canvas, multiplier){
+        this.ctx = canvas.getContext('2d');
+        this.multiplier = multiplier;
+        
+        this.ctx.canvas.width = SCREEN_WIDTH * this.multiplier;
+        this.ctx.canvas.height = SCREEN_HEIGHT * this.multiplier;
+        this.ctx.fillStyle = 'green';
+    }
+
+    draw(x, y, isOn){
+        if(isOn){
+            this.ctx.fillRect(x * this.multiplier, y * this.multiplier, 1 * this.multiplier, 1 * this.multiplier);
+        }else {
+            this.ctx.clearRect(x * this.multiplier, y * this.multiplier, 1 * this.multiplier , 1 * this.multiplier);
+        }
+    }
+    clearDisplay(){
+        this.ctx.clearRect(0, 0, SCREEN_WIDTH * this.multiplier, SCREEN_HEIGHT * this.multiplier);
+    }
+}
+
+module.exports = {
+    WebInterface,
+}
+},{}],3:[function(require,module,exports){
+const FILE_PATH = './roms/Keypad_test.ch8'
 
 const KEYLAYOUT = [ 'x', '1', '2', '3',
                     'q', 'w', 'e', 'a',
                     's', 'd', 'z', 'c',
                     '4', 'r', 'f', 'v']
-const {Chip8} = require("./chip8.js");
-const {Interface} = require("./mockInterface.js");
-const fs = require('fs');
-const readLineModule = require('readline');
+const {Chip8} = require("./class/chip8.js");
+const {WebInterface} = require("./class/webInterface.js");
 
 let tickLengthMs = 1000 / 60;
 let previousTick = Date.now();
+let timer = 0;
 
-readLineModule.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
+const canvas = document.getElementById('canvas');
+let webinterface = new WebInterface(canvas, 40);
+let chip8 = new Chip8(webinterface);
+loadROM(FILE_PATH);
 
-let chip8 = new Chip8();
-let interface = new Interface();
+// implement new read I/0
+// keyup event
+document.addEventListener('keydown', event => {
+    const keyIndex = KEYLAYOUT.indexOf(event.key);
 
-let data = fs.readFileSync(FILE_PATH);
-chip8.loadROM(data);
+    if(keyIndex != -1){
+        let value = new Uint16Array(1);
+        value[0] = 0b1 << keyIndex;
+        chip8.keyValue = chip8.keyValue | value[0];
+    }
+});
+// keydown event
+document.addEventListener('keyup', event => {
+    chip8.resetKeys();
+})
+
+// implement new readfile func
 
 function cycle(){
-    let now = Date.now();
-    if(previousTick + tickLengthMs <= now){
-        let delta = (now - previousTick) /1000
-        previousTick = now;
-
-        console.clear();
-        let opcode = chip8._fetch(chip8.PC);
-        chip8._execute(opcode);
-        
-        // display
-        interface.renderDisplay(chip8.screenBuffer);
-        // delayTimer
+    timer++;
+    if(timer % 5 == 0){
         chip8._decreaseT();
-
-        console.log('delta', delta, '(target: ' + tickLengthMs +' ms)');
+        timer = 0;
     }
+    let opcode = chip8._fetch(chip8.PC);
+    chip8._execute(opcode);
 
-    if(Date.now() - previousTick < tickLengthMs){
-        setTimeout(cycle);
-    }else {
-        setImmediate(cycle);
-    }
+    // display is combined with chip8 class
+    // delayTimer
+
+    setTimeout(cycle, 3);
     
 }
 
+async function loadROM(file_path){
+    const response = await fetch(file_path);
+    const arrayBuffer = await response.arrayBuffer()
+    const uint8View = new Uint8Array(arrayBuffer);
+
+    webinterface.clearDisplay();
+    console.log(uint8View);
+    chip8.loadROM(uint8View);
+
+    cycle();
+}
+
+
+
 // I/O
-process.stdin.on('keypress', (ch, key) => {
-    // keyup event
-    if(KEYLAYOUT.indexOf(ch) != -1){
-        let value = new Uint16Array(1);
-        value[0] = 0b1 << KEYLAYOUT.indexOf(ch);
-        chip8.keyValue = chip8.keyValue | value[0];
-        // console.log(chip8.keyValue.toString(2).padStart(16, '0'));
+// process.stdin.on('keypress', (ch, key) => {
+//     // keyup event
+//     if(KEYLAYOUT.indexOf(ch) != -1){
+//         let value = new Uint16Array(1);
+//         value[0] = 0b1 << KEYLAYOUT.indexOf(ch);
+//         chip8.keyValue = chip8.keyValue | value[0];
+//         // console.log(chip8.keyValue.toString(2).padStart(16, '0'));
 
-        // keydown event
-        setTimeout(() =>{
-            chip8.keyValue = chip8.keyValue & (~value[0]);
-            // console.log(chip8.keyValue.toString(2).padStart(16, '0'));
-        }, 500);
-    }
+//         // keydown event
+//         setTimeout(() =>{
+//             chip8.keyValue = chip8.keyValue & (~value[0]);
+//             // console.log(chip8.keyValue.toString(2).padStart(16, '0'));
+//         }, 500);
+//     }
 
-    if(key && key.ctrl && key.name == 'c'){
-        process.exit();
-    }
-})
-cycle();
-
-
-
-}).call(this)}).call(this,require('_process'),require("timers").setImmediate)
-},{"./chip8.js":1,"./mockInterface.js":3,"_process":5,"fs":4,"readline":4,"timers":6}],3:[function(require,module,exports){
-const WIDTH = 64;
-const HEIGHT = 32;
-const SCREEN_BUFFER = new Array(64*32).fill(0);
-
-class Interface{
-    constructor(){
-
-    }
-
-    renderDisplay(screenBuffer){ 
-
-        for(let i = 0; i < HEIGHT; i++){
-            let text = ''
-            for(let j = 0; j < WIDTH; j++){
-                if(screenBuffer[i * WIDTH +j] == 0)
-                    text += ' ';
-                else text += '█';    
-            }
-            console.log(text);
-        }
-    }
-}
-
-// let interface = new Interface()
-// interface.renderDisplay(SCREEN_BUFFER);
-
-module.exports = {
-    Interface,
-}
-
-
-},{}],4:[function(require,module,exports){
-
-},{}],5:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
+//     if(key && key.ctrl && key.name == 'c'){
+//         process.exit();
+//     }
+// })
 
 
 
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],6:[function(require,module,exports){
-(function (setImmediate,clearImmediate){(function (){
-var nextTick = require('process/browser.js').nextTick;
-var apply = Function.prototype.apply;
-var slice = Array.prototype.slice;
-var immediateIds = {};
-var nextImmediateId = 0;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) { timeout.close(); };
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// That's not how node.js implements it but the exposed api is the same.
-exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-  var id = nextImmediateId++;
-  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
-
-  immediateIds[id] = true;
-
-  nextTick(function onNextTick() {
-    if (immediateIds[id]) {
-      // fn.call() is faster so we optimize for the common use-case
-      // @see http://jsperf.com/call-apply-segu
-      if (args) {
-        fn.apply(null, args);
-      } else {
-        fn.call(null);
-      }
-      // Prevent ids from leaking
-      exports.clearImmediate(id);
-    }
-  });
-
-  return id;
-};
-
-exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
-  delete immediateIds[id];
-};
-}).call(this)}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":5,"timers":6}]},{},[2]);
+},{"./class/chip8.js":1,"./class/webInterface.js":2}]},{},[3]);

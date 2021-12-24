@@ -20,7 +20,7 @@ const FONTS = [0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0xF0, 0x80, 0xF0, 0x80, 0x80];  // F
 
 class Chip8 {
-    constructor(){
+    constructor(webInterface){
         this.memory = new Uint8Array(MEMORY_SIZE).fill(0);
         this.registers = new Uint8Array(16).fill(0);
         this.I = 0;
@@ -34,6 +34,7 @@ class Chip8 {
 
         this.screenBuffer = new Array(SCREEN_SIZE).fill(0);
         this.keyValue = 0; // 16 bit size each bit represent pressed or not press by its key
+        this.webInterface = webInterface;
     }
     loadROM(buffer){
         console.log("loading rom into memory...");
@@ -49,6 +50,9 @@ class Chip8 {
             this.memory[0x50 + i] = FONTS[i];
         }
         console.log("loading FONTS successfully");
+    }
+    resetKeys(){
+        this.keyValue = 0;
     }
     _fetch(PC){
         //argument : PC -> program counter pointing at present address
@@ -219,6 +223,7 @@ class Chip8 {
         this.screenBuffer.fill(0);
         // this is CLS for mockup UI;
 
+        this.webInterface.clearDisplay();
         // has to implement CLS for terminal
     }
     RET(){
@@ -385,7 +390,8 @@ class Chip8 {
                 if(bit == 1 && this.screenBuffer[coorY * SCREEN_WIDTH + coorX] == 1){                    
                     this.registers[0xF] = 1;
                 }
-                this.screenBuffer[coorY * SCREEN_WIDTH + coorX] = (this.screenBuffer[coorY * SCREEN_WIDTH + coorX] ^ bit) & 1; 
+                this.screenBuffer[coorY * SCREEN_WIDTH + coorX] = (this.screenBuffer[coorY * SCREEN_WIDTH + coorX] ^ bit) & 1;
+                this.webInterface.draw(coorX, coorY, this.screenBuffer[coorY * SCREEN_WIDTH + coorX]);
 
             }
         }
