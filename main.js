@@ -1,4 +1,4 @@
-const FILE_PATH = 'roms/pong1.ch8'
+const FILE_PATH = 'roms/Spaceinvader.ch8'
 
 const KEYLAYOUT = [ 'x', '1', '2', '3',
                     'q', 'w', 'e', 'a',
@@ -8,6 +8,9 @@ const {Chip8} = require("./chip8.js");
 const {Interface} = require("./mockInterface.js");
 const fs = require('fs');
 const readLineModule = require('readline');
+
+let tickLengthMs = 1000 / 60;
+let previousTick = Date.now();
 
 readLineModule.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
@@ -19,18 +22,32 @@ let data = fs.readFileSync(FILE_PATH);
 chip8.loadROM(data);
 
 function cycle(){
-    // console.clear();
-    let opcode = chip8._fetch(chip8.PC);
-    chip8._execute(opcode);
+    let now = Date.now();
+    if(previousTick + tickLengthMs <= now){
+        let delta = (now - previousTick) /1000
+        previousTick = now;
+
+        console.clear();
+        let opcode = chip8._fetch(chip8.PC);
+        chip8._execute(opcode);
+        
+        // display
+        interface.renderDisplay(chip8.screenBuffer);
+        // delayTimer
+        chip8._decreaseT();
+
+        console.log('delta', delta, '(target: ' + tickLengthMs +' ms)');
+    }
+
+    if(Date.now() - previousTick < tickLengthMs - 16){
+        setTimeout(cycle);
+    }else {
+        setImmediate(cycle);
+    }
     
-    // add a delay timer
-    // console.clear();
-    
-    interface.renderDisplay(chip8.screenBuffer);
-    chip8._decreaseT();
-    // display
-    // I/O
 }
+
+// I/O
 process.stdin.on('keypress', (ch, key) => {
     // keyup event
     if(KEYLAYOUT.indexOf(ch) != -1){
@@ -43,14 +60,13 @@ process.stdin.on('keypress', (ch, key) => {
         setTimeout(() =>{
             chip8.keyValue = chip8.keyValue & (~value[0]);
             // console.log(chip8.keyValue.toString(2).padStart(16, '0'));
-        }, 100);
+        }, 500);
     }
 
     if(key && key.ctrl && key.name == 'c'){
         process.exit();
     }
 })
-setInterval(cycle, 50);
-
+cycle();
 
 
