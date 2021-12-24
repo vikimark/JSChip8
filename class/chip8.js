@@ -400,7 +400,9 @@ class Chip8 {
     SKP_Vx(opcode){
         const numRegister = ((opcode >> 8) & 0xF);
         const value = 0b1 << this.registers[numRegister];
-        if((this.keyValue & value) >> this.registers[numRegister]){
+        let logit = (this.keyValue & value) >> this.registers[numRegister];
+        console.log(logit);
+        if(logit){
             this.PC += 2;
         }
         // throw 'SKP_Vx not implement';

@@ -8,7 +8,7 @@ class WebInterface{
         
         this.ctx.canvas.width = SCREEN_WIDTH * this.multiplier;
         this.ctx.canvas.height = SCREEN_HEIGHT * this.multiplier;
-        this.ctx.fillStyle = 'green';
+        this.ctx.fillStyle = 'orange';
     }
 
     draw(x, y, isOn){

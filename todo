@@ -3,5 +3,8 @@
 -> cpu : solved
 -> opcode: solved
 -> game cycle: solved 
--> delaytimer issue : UN
--> keypress issue : most of real time game are unplayable (can play slow game)
+-> delaytimer issue : solved
+-> keypress issue : most of real time game are unplayable (can play slow game) : solved (delya timer issued)
+-> some keypress function aren't working correctly
+-> FPS is unsure :
+-> Space invader game, the game is not waiting at first page

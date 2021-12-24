@@ -1,4 +1,4 @@
-const FILE_PATH = './roms/Keypad_test.ch8'
+const FILE_PATH = './roms/SpaceInvader.ch8'
 
 const KEYLAYOUT = [ 'x', '1', '2', '3',
                     'q', 'w', 'e', 'a',
@@ -12,7 +12,7 @@ let previousTick = Date.now();
 let timer = 0;
 
 const canvas = document.getElementById('canvas');
-let webinterface = new WebInterface(canvas, 40);
+let webinterface = new WebInterface(canvas, 10);
 let chip8 = new Chip8(webinterface);
 loadROM(FILE_PATH);
 
