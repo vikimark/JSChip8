@@ -1,4 +1,4 @@
-const FILE_PATH = 'roms/Spaceinvader.ch8'
+const FILE_PATH = 'roms/1dcell.ch8'
 
 const KEYLAYOUT = [ 'x', '1', '2', '3',
                     'q', 'w', 'e', 'a',
@@ -39,7 +39,7 @@ function cycle(){
         console.log('delta', delta, '(target: ' + tickLengthMs +' ms)');
     }
 
-    if(Date.now() - previousTick < tickLengthMs - 16){
+    if(Date.now() - previousTick < tickLengthMs){
         setTimeout(cycle);
     }else {
         setImmediate(cycle);

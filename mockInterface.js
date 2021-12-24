@@ -14,7 +14,7 @@ class Interface{
             for(let j = 0; j < WIDTH; j++){
                 if(screenBuffer[i * WIDTH +j] == 0)
                     text += ' ';
-                else text += '■';    
+                else text += '█';    
             }
             console.log(text);
         }
