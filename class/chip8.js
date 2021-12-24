@@ -409,7 +409,7 @@ class Chip8 {
     SKNP_Vx(opcode){
         const numRegister = ((opcode >> 8) & 0xF);
         const value = 0b1 << this.registers[numRegister];
-        if(!(this.keyValue & value) >> this.registers[numRegister]){
+        if(!((this.keyValue & value) >> this.registers[numRegister])){
             this.PC += 2;
         }
         // throw 'SKNP not implement';

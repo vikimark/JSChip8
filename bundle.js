@@ -410,7 +410,7 @@ class Chip8 {
     SKNP_Vx(opcode){
         const numRegister = ((opcode >> 8) & 0xF);
         const value = 0b1 << this.registers[numRegister];
-        if(!(this.keyValue & value) >> this.registers[numRegister]){
+        if(!((this.keyValue & value) >> this.registers[numRegister])){
             this.PC += 2;
         }
         // throw 'SKNP not implement';
@@ -523,7 +523,7 @@ module.exports = {
     WebInterface,
 }
 },{}],3:[function(require,module,exports){
-const FILE_PATH = './roms/SpaceInvader.ch8'
+const FILE_PATH = './roms/pong1.ch8'
 
 const KEYLAYOUT = [ 'x', '1', '2', '3',
                     'q', 'w', 'e', 'a',
@@ -571,7 +571,7 @@ function cycle(){
     // display is combined with chip8 class
     // delayTimer
 
-    setTimeout(cycle, 3);
+    setTimeout(cycle, 2);
     
 }
 
