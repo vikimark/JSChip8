@@ -401,7 +401,6 @@ class Chip8 {
         const numRegister = ((opcode >> 8) & 0xF);
         const value = 0b1 << this.registers[numRegister];
         let logit = (this.keyValue & value) >> this.registers[numRegister];
-        console.log(logit);
         if(logit){
             this.PC += 2;
         }
