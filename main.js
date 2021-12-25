@@ -25,20 +25,37 @@ document.querySelector('select').addEventListener('change', loadROM);
 // alternative I/O
 let keys = document.querySelectorAll(".key");
 keys.forEach(key => {
-    key.onmousedown = function (){
-        key.classList.add("click");
-        const key_data = key.getAttribute("data-key");
-        const keyIndex = parseInt(key_data);
-        chip8.keyValue = chip8.keyValue | (0b1 << keyIndex);
-    }
-    key.onmouseup = function(){
-        key.classList.remove("click");
-        chip8.resetKeys();
-    }
-    key.onmouseleave = function(){
-        key.classList.remove("click");
-        chip8.resetKeys();
-    }
+    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+        // true for mobile device
+        key.onclick = function(){
+            key.classList.add("click");
+            const key_data = key.getAttribute("data-key");
+            const keyIndex = parseInt(key_data);
+            chip8.keyValue = chip8.keyValue | (0b1 << keyIndex);
+
+            setTimeout(()=>{
+                key.classList.remove("click");
+                chip8.resetKeys();
+            }, 100);
+        }
+      }else{
+        // false for not mobile device
+        key.onmousedown = function (){
+            key.classList.add("click");
+            const key_data = key.getAttribute("data-key");
+            const keyIndex = parseInt(key_data);
+            chip8.keyValue = chip8.keyValue | (0b1 << keyIndex);
+        }
+        key.onmouseup = function(){
+            key.classList.remove("click");
+            chip8.resetKeys();
+        }
+        key.onmouseleave = function(){
+            key.classList.remove("click");
+            chip8.resetKeys();
+        }
+      }
+    
 
 })
 
