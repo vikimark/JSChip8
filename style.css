@@ -23,6 +23,7 @@ body {
     margin: 10px;
     border-radius: 2px;
     width: 233px;
+    touch-action: manipulation;
     
 }
 #panel{
@@ -36,6 +37,7 @@ body {
     margin: 10px;
     width: 214px;
     height: 104px;
+    touch-action: manipulation;
 }
 .config{
     box-shadow: #afafaf 1px 1px 0 0;
