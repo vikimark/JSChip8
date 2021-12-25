@@ -157,8 +157,35 @@ async function loadROM(){
     webinterface.clearDisplay();
     console.log(uint8View);
     chip8.loadROM(uint8View);
+    changeInstruction(rom);
     cycle();
 
+}
+
+function changeInstruction(rom){
+    let text = "";
+    switch(rom){
+        case "breakout.ch8":
+            text = "4(Q) -> go left\n6(E) -> go right";
+        break;
+        case "guess.ch8":
+            text = "think to a number from 0 to 62\nif that number appear on the screen \npress 5(W), otherwise press other \nkeys"
+        break;
+        case "SpaceInvader.ch8":
+            text = "5(W) -> start game\n5(W) -> shoot\n4(Q) -> go left\n6(E) -> go right";
+        break;
+        case "pong1.ch8":
+            text = "1(1) -> go up\n4(Q) -> go down";
+        break;
+        case "1dcell.ch8":
+            text = "It's a Wolfram cellular automata. \nThere is nothing to do with this game";
+        break;
+        default:
+            text = "Select your game and\nthe instruction will appear!";
+            break;       
+    }
+    const instructionsDisplay = document.querySelector('p.instructions')
+    instructionsDisplay.textContent = text;
 }
 
 
