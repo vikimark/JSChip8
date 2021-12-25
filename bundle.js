@@ -504,7 +504,7 @@ class WebInterface{
         
         this.ctx.canvas.width = SCREEN_WIDTH * this.multiplier;
         this.ctx.canvas.height = SCREEN_HEIGHT * this.multiplier;
-        this.ctx.fillStyle = 'orange';
+        this.ctx.fillStyle = '#F0A500';
     }
 
     draw(x, y, isOn){
@@ -523,7 +523,7 @@ module.exports = {
     WebInterface,
 }
 },{}],3:[function(require,module,exports){
-const FILE_PATH = './roms/pong1.ch8'
+const FILE_PATH = './roms/mastermind.ch8'
 
 const KEYLAYOUT = [ 'x', '1', '2', '3',
                     'q', 'w', 'e', 'a',
@@ -532,7 +532,7 @@ const KEYLAYOUT = [ 'x', '1', '2', '3',
 const {Chip8} = require("./class/chip8.js");
 const {WebInterface} = require("./class/webInterface.js");
 
-let tickLengthMs = 1000 / 60;
+let tickLengthMs = 1000 / 20;
 let previousTick = Date.now();
 let timer = 0;
 
@@ -571,7 +571,7 @@ function cycle(){
     // display is combined with chip8 class
     // delayTimer
 
-    setTimeout(cycle, 2);
+    setTimeout(cycle, 3);
     
 }
 
