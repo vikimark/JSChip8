@@ -523,7 +523,7 @@ module.exports = {
     WebInterface,
 }
 },{}],3:[function(require,module,exports){
-const FILE_PATH = './roms/mastermind.ch8'
+const FILE_PATH = './roms/Keypad_test.ch8'
 
 const KEYLAYOUT = [ 'x', '1', '2', '3',
                     'q', 'w', 'e', 'a',
@@ -540,6 +540,26 @@ const canvas = document.getElementById('canvas');
 let webinterface = new WebInterface(canvas, 10);
 let chip8 = new Chip8(webinterface);
 loadROM(FILE_PATH);
+
+// alternative I/O
+let keys = document.querySelectorAll(".key");
+keys.forEach(key => {
+    key.onmousedown = function (){
+        key.classList.add("click");
+        const key_data = key.getAttribute("data-key");
+        const keyIndex = parseInt(key_data);
+        chip8.keyValue = chip8.keyValue | (0b1 << keyIndex);
+    }
+    key.onmouseup = function(){
+        key.classList.remove("click");
+        chip8.resetKeys();
+    }
+    key.onmouseleave = function(){
+        key.classList.remove("click");
+        chip8.resetKeys();
+    }
+
+})
 
 // implement new read I/0
 // keyup event
