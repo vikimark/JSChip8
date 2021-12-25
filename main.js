@@ -180,9 +180,18 @@ function changeInstruction(rom){
         case "1dcell.ch8":
             text = "It's a Wolfram cellular automata. \nThere is nothing to do with this game";
         break;
+        case "snake.ch8":
+            text = "5(W) -> move up\n7(A) -> move left\n8(S) -> move down\n9(D) -> move right";
+            break;
+        case "spacejam.ch8":
+            text =  "5(W) -> move up\n7(A) -> move left\n8(S) -> move down\n9(D) -> move right";  
+            break;
+        case "pumpkindressup.ch8":
+            text = "as the display state";
+            break;     
         default:
             text = "Select your game and\nthe instruction will appear!";
-            break;       
+            break;           
     }
     const instructionsDisplay = document.querySelector('p.instructions')
     instructionsDisplay.textContent = text;
