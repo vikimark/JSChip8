@@ -54,6 +54,21 @@ class Chip8 {
     resetKeys(){
         this.keyValue = 0;
     }
+    resetValue(){
+        this.memory = new Uint8Array(MEMORY_SIZE).fill(0);
+        this.registers = new Uint8Array(16).fill(0);
+        this.I = 0;
+        this.DT = 0;
+        this.ST = 0;
+        this.PC = 0x200;
+        this.SP = -1;
+        this.stack = new Uint16Array(16).fill(0);
+
+        this.loadFonts();
+
+        this.screenBuffer = new Array(SCREEN_SIZE).fill(0);
+        this.keyValue = 0; // 16 bit size each bit represent pressed or not press by its key
+    }
     _fetch(PC){
         //argument : PC -> program counter pointing at present address
         //return   : opcode combining two 2 bytes in endian way(?)

@@ -55,6 +55,21 @@ class Chip8 {
     resetKeys(){
         this.keyValue = 0;
     }
+    resetValue(){
+        this.memory = new Uint8Array(MEMORY_SIZE).fill(0);
+        this.registers = new Uint8Array(16).fill(0);
+        this.I = 0;
+        this.DT = 0;
+        this.ST = 0;
+        this.PC = 0x200;
+        this.SP = -1;
+        this.stack = new Uint16Array(16).fill(0);
+
+        this.loadFonts();
+
+        this.screenBuffer = new Array(SCREEN_SIZE).fill(0);
+        this.keyValue = 0; // 16 bit size each bit represent pressed or not press by its key
+    }
     _fetch(PC){
         //argument : PC -> program counter pointing at present address
         //return   : opcode combining two 2 bytes in endian way(?)
@@ -535,11 +550,12 @@ const {WebInterface} = require("./class/webInterface.js");
 let tickLengthMs = 1000 / 20;
 let previousTick = Date.now();
 let timer = 0;
+let running = false;
 
 const canvas = document.getElementById('canvas');
 let webinterface = new WebInterface(canvas, 10);
 let chip8 = new Chip8(webinterface);
-loadROM(FILE_PATH);
+document.querySelector('select').addEventListener('change', loadROM);
 
 // alternative I/O
 let keys = document.querySelectorAll(".key");
@@ -580,32 +596,38 @@ document.addEventListener('keyup', event => {
 // implement new readfile func
 
 function cycle(){
-    timer++;
-    if(timer % 5 == 0){
-        chip8._decreaseT();
-        timer = 0;
+    if(running){
+        timer++;
+        if(timer % 5 == 0){
+            chip8._decreaseT();
+            timer = 0;
+        }
+        let opcode = chip8._fetch(chip8.PC);
+        chip8._execute(opcode);
+
+        // display is combined with chip8 class
+        // delayTimer
+        setTimeout(cycle, 3);
     }
-    let opcode = chip8._fetch(chip8.PC);
-    chip8._execute(opcode);
-
-    // display is combined with chip8 class
-    // delayTimer
-
-    setTimeout(cycle, 3);
     
 }
-
-async function loadROM(file_path){
-    const response = await fetch(file_path);
+async function loadROM(){
+    running = false;
+    const rom = event.target.value;
+    console.log(rom);
+    const response = await fetch('./roms/' + rom);
     const arrayBuffer = await response.arrayBuffer()
     const uint8View = new Uint8Array(arrayBuffer);
 
+    running = true;
+    chip8.resetValue();
     webinterface.clearDisplay();
     console.log(uint8View);
     chip8.loadROM(uint8View);
-
     cycle();
+
 }
+
 
 
 
