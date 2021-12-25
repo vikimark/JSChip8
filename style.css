@@ -18,6 +18,30 @@ body {
     width: 233px;
     margin: 57px 20px 20px 20px;
 }
+#panel{
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    border: 1px solid #afafaf;
+    border-radius: 2px;
+    width: 214px;
+    margin: 57px 20px 20px 20px;
+}
+.config{
+    box-shadow: #afafaf 1px 1px 0 0;
+    border-radius: 2px;
+    border: 1px solid #afafaf;
+    background-color: floralwhite;
+    margin: 6px;
+    line-height: 40px;
+    width: 200px;
+    height: 40px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 18px;
+    cursor: pointer;
+}
 
 .key{
     display: inline-block;

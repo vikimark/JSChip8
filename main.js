@@ -12,6 +12,11 @@ let previousTick = Date.now();
 let timer = 0;
 let running = false;
 
+var stop = false;
+var frameCount = 0;
+var fps = 1000;
+var fpsInterval, startTime, now, then, elapsed;
+
 const canvas = document.getElementById('canvas');
 let webinterface = new WebInterface(canvas, 10);
 let chip8 = new Chip8(webinterface);
@@ -35,6 +40,35 @@ keys.forEach(key => {
         chip8.resetKeys();
     }
 
+})
+
+let configs = document.querySelectorAll(".config");
+configs.forEach(config =>{
+    if(config.getAttribute("data-key") == "1"){
+        config.onmousedown = function(){
+            config.classList.add("click");
+            cycle();
+        }
+        config.onmouseup = function(){
+            key.classList.remove("click");
+        }
+        config.onmouseleave = function(){
+            key.classList.remove("click");
+        }
+    }
+    if(config.getAttribute("data-key") == "0"){
+        config.onmousedown = function(){
+            config.classList.add("click");
+            running = false;
+            setTimeout(()=>{running = true;cycle();}, 100);
+        }
+        config.onmouseup = function(){
+            key.classList.remove("click");
+        }
+        config.onmouseleave = function(){
+            key.classList.remove("click");
+        }
+    }
 })
 
 // implement new read I/0
@@ -70,6 +104,28 @@ function cycle(){
         setTimeout(cycle, 3);
     }
     
+}
+function startAnimating(fps){
+    fpsInterval = 1000 / fps;
+    then = Date.now();
+    startTime = then;
+    newCycle();
+}
+
+function newCycle(){
+    if(running){
+        timer++;
+        if(timer % 5 == 0){
+            chip8._decreaseT();
+            timer = 0;
+        }
+        let opcode = chip8._fetch(chip8.PC);
+        chip8._execute(opcode);
+    }
+    
+    setTimeout(() => {
+        requestAnimationFrame(newCycle);
+    }, 1000/fps);
 }
 async function loadROM(){
     running = false;
