@@ -7,20 +7,29 @@
         <link rel="stylesheet" href="./style.css">
     </head>
     <body>
-        <select id='rom-select'>
-            <option value>SELECT ROM TO PLAY!</option>
-            <option value="breakout.ch8">BREAKOUT</option>
-            <option value="guess.ch8">GUESS</option>
-            <option value="SpaceInvader.ch8">SPACE INVADERS</option>
-            <option value="pong1.ch8">PONG 1 PLAYERS</option>
-            <option value="1dcell.ch8">WOLFFRAM_CA</option>
-        </select>
+        <pre class="logo">    
+            @@@   @@@@@@    @@@@@@@  @@@  @@@  @@@  @@@@@@@               @@@@@@   
+            @@@  @@@@@@@   @@@@@@@@  @@@  @@@  @@@  @@@@@@@@             @@@@@@@@  
+            @@!  !@@       !@@       @@!  @@@  @@!  @@!  @@@             @@!  @@@  
+            !@!  !@!       !@!       !@!  @!@  !@!  !@!  @!@             !@!  @!@  
+            !!@  !!@@!!    !@!       @!@!@!@!  !!@  @!@@!@!   @!@!@!@!@   !@!!@!   
+            !!!   !!@!!!   !!!       !!!@!!!!  !!!  !!@!!!    !!!@!@!!!   !!@!!!   
+            !!:       !:!  :!!       !!:  !!!  !!:  !!:                  !!:  !!!  
+       !!:  :!:      !:!   :!:       :!:  !:!  :!:  :!:                  :!:  !:!  
+       ::: : ::  :::: ::    ::: :::  ::   :::   ::   ::                  ::::: ::  
+        : :::    :: : :     :: :: :   :   : :   :    :                    : :  :   
+                                                             
+        </pre>
         <section>
             <div style="width:640px; margin:0 auto;">
                 <canvas id="canvas"></canvas>
             </div>
         </section>
-        <section>
+        <section id="input">
+            <div id="panel">
+                <div class="config" data-key="1">Speed up!</div>
+                <div class="config" data-key="0">reset Speed</div>
+            </div>
             <div id="controller">
                 <div class="key" data-key="1">1</div>
                 <div class="key" data-key="2">2</div>
@@ -39,13 +48,18 @@
                 <div class="key" data-key="11">B</div>
                 <div class="key" data-key="15">F</div>
             </div>
-            <aside>
-                <div id="panel">
-                    <div class="config" data-key="1">Speed up!</div>
-                    <div class="config" data-key="0">reset Speed</div>
-                </div>
-            </aside>
+            <div id="rom">
+                <select id='rom-select'>
+                    <option value>SELECT ROM TO PLAY!</option>
+                    <option value="breakout.ch8">BREAKOUT</option>
+                    <option value="guess.ch8">GUESS</option>
+                    <option value="SpaceInvader.ch8">SPACE INVADERS</option>
+                    <option value="pong1.ch8">PONG 1 PLAYERS</option>
+                    <option value="1dcell.ch8">WOLFFRAM_CA</option>
+                </select>
+            </div>
         </section> 
+            
         <script src="bundle.js"></script>    
     </body>
 </html>
