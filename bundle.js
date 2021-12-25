@@ -565,7 +565,7 @@ document.querySelector('select').addEventListener('change', loadROM);
 // alternative I/O
 let keys = document.querySelectorAll(".key");
 keys.forEach(key => {
-    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+    if((/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) || (/Macintosh/.test(navigator.userAgent) && 'ontouchend' in document)){
         // true for mobile device
         key.onclick = function(){
             key.classList.add("click");
