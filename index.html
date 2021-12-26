@@ -4,20 +4,21 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>CHIP-8</title>
+        <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
         <link rel="stylesheet" href="./style.css">
     </head>
     <body>
         <pre class="logo">    
-            @@@   @@@@@@    @@@@@@@  @@@  @@@  @@@  @@@@@@@               @@@@@@   
-            @@@  @@@@@@@   @@@@@@@@  @@@  @@@  @@@  @@@@@@@@             @@@@@@@@  
-            @@!  !@@       !@@       @@!  @@@  @@!  @@!  @@@             @@!  @@@  
-            !@!  !@!       !@!       !@!  @!@  !@!  !@!  @!@             !@!  @!@  
-            !!@  !!@@!!    !@!       @!@!@!@!  !!@  @!@@!@!   @!@!@!@!@   !@!!@!   
-            !!!   !!@!!!   !!!       !!!@!!!!  !!!  !!@!!!    !!!@!@!!!   !!@!!!   
-            !!:       !:!  :!!       !!:  !!!  !!:  !!:                  !!:  !!!  
-       !!:  :!:      !:!   :!:       :!:  !:!  :!:  :!:                  :!:  !:!  
-       ::: : ::  :::: ::    ::: :::  ::   :::   ::   ::                  ::::: ::  
-        : :::    :: : :     :: :: :   :   : :   :    :                    : :  :   
+        @@@   @@@@@@    @@@@@@@  @@@  @@@  @@@  @@@@@@@               @@@@@@   
+        @@@  @@@@@@@   @@@@@@@@  @@@  @@@  @@@  @@@@@@@@             @@@@@@@@  
+        @@!  !@@       !@@       @@!  @@@  @@!  @@!  @@@             @@!  @@@  
+        !@!  !@!       !@!       !@!  @!@  !@!  !@!  @!@             !@!  @!@  
+        !!@  !!@@!!    !@!       @!@!@!@!  !!@  @!@@!@!   @!@!@!@!@   !@!!@!   
+        !!!   !!@!!!   !!!       !!!@!!!!  !!!  !!@!!!    !!!@!@!!!   !!@!!!   
+        !!:       !:!  :!!       !!:  !!!  !!:  !!:                  !!:  !!!  
+   !!:  :!:      !:!   :!:       :!:  !:!  :!:  :!:                  :!:  !:!  
+   ::: : ::  :::: ::    ::: :::  ::   :::   ::   ::                  ::::: ::  
+    : :::    :: : :     :: :: :   :   : :   :    :                    : :  :   
                                                              
         </pre>
         <section>
@@ -27,8 +28,8 @@
         </section>
         <section id="input">
             <div id="panel">
-                <div class="config" data-key="1">Speed up!</div>
-                <div class="config" data-key="0">reset Speed</div>
+                <div class="config" data-key="1" style="font-family: 'oswald';">Speed Up!</div>
+                <div class="config" data-key="0" style="font-family: 'oswald';">Reset Speed</div>
             </div>
             <div id="controller">
                 <div class="key" data-key="1">1</div>
@@ -67,7 +68,7 @@
                 </div>        
             </div>
         </section> 
-            
+        <p id="article" style="text-align: center;"><a href="https://medium.com/@phuritsiritip/ab1a90dd85d1">Read the article</a></p>   
         <script src="bundle.js"></script>    
     </body>
 </html>
